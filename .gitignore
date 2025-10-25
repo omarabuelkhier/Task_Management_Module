@@ -1,0 +1,29 @@
+# Node
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+
+# Logs
+**/*.log
+
+# Env
+frontend/.env
+backend/.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# PHP/Laravel
+/vendor/
+/public/storage
+/storage/*.key
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/.phpunit.result.cache
+.phpunit.cache/
+
+# Editor
+.vscode/
+.idea/
