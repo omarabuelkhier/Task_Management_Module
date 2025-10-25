@@ -34,7 +34,13 @@ trait ApiResponse
      */
     protected function paginated(LengthAwarePaginator $paginator, string $resourceClass, string $message = 'OK', int $code = 200)
     {
-    $items = $resourceClass::collection(collect($paginator->items()));
+        $collection = collect($paginator->items());
+        // Convert resource collection to plain array of items
+        $items = $resourceClass::collection($collection)->toArray(request());
+        // If collection returns ['data' => [...]], flatten it
+        if (is_array($items) && array_key_exists('data', $items)) {
+            $items = $items['data'];
+        }
         $meta = [
             'current_page' => $paginator->currentPage(),
             'per_page' => $paginator->perPage(),

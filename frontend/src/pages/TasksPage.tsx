@@ -5,6 +5,7 @@ import { Task, DerivedStatus, Priority } from '../types/task'
 import StatusBadge from '../components/StatusBadge'
 import PriorityBadge from '../components/PriorityBadge'
 import { Link } from 'react-router-dom'
+import { fetchTasks } from '../services/tasks'
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -12,15 +13,18 @@ export default function TasksPage() {
   const [priority, setPriority] = useState<Priority | 'All'>('All')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const [meta, setMeta] = useState<any | null>(null)
 
   const load = async () => {
     setLoading(true)
     setError(null)
     try {
-      const params: any = {}
-      if (priority !== 'All') params.priority = priority
-      const { data } = await axiosClient.get<Task[]>('/tasks', { params })
-      setTasks(data)
+  const params: any = { page }
+  if (priority !== 'All') params.priority = priority
+  const res = await fetchTasks(params)
+  setTasks(res.items)
+  setMeta(res.meta)
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to load tasks')
     } finally {
@@ -30,7 +34,7 @@ export default function TasksPage() {
 
   useEffect(() => {
     load()
-  }, [priority])
+  }, [priority, page])
 
   const filtered = useMemo(() => {
     if (status === 'All') return tasks
@@ -59,7 +63,7 @@ export default function TasksPage() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="mx-auto w-full max-w-6xl p-4 sm:p-6">
+  <div className="mx-auto w-full max-w-6xl p-4 sm:p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div className="flex w-full items-center gap-2 sm:w-auto">
             <select value={status} onChange={e=>setStatus(e.target.value as any)} className="select">
@@ -97,6 +101,27 @@ export default function TasksPage() {
             </li>
           ))}
         </ul>
+        {meta && (
+          <div className="mt-4 flex items-center justify-between">
+            <button
+              className="btn-secondary"
+              disabled={page <= 1}
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+            >
+              Previous
+            </button>
+            <div className="text-sm text-gray-600 dark:text-gray-300">
+              Page {meta.current_page} of {meta.last_page}
+            </div>
+            <button
+              className="btn-secondary"
+              disabled={!meta.has_more}
+              onClick={() => setPage(p => p + 1)}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

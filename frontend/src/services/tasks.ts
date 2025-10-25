@@ -1,9 +1,16 @@
 import { axiosClient } from '../lib/axiosClient'
 import { Task } from '../types/task'
 
-export async function fetchTasks(params?: { priority?: string }) {
-  const { data } = await axiosClient.get<Task[]>('/tasks', { params })
-  return data
+type ApiResponse<T> = {
+  success: boolean
+  message: string
+  data: T
+  meta?: any
+}
+
+export async function fetchTasks(params?: { priority?: string, page?: number, per_page?: number }) {
+  const { data } = await axiosClient.get<ApiResponse<Task[]>>('/tasks', { params })
+  return { items: data.data, meta: data.meta }
 }
 
 export async function fetchTask(id: number) {
