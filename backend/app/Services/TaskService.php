@@ -5,10 +5,11 @@ namespace App\Services;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TaskService
 {
-    public function listAssignedTasks(User $user, ?string $priority = null, ?string $status = null): Collection
+    public function listAssignedTasks(User $user, ?string $priority = null, ?string $status = null, int $perPage = 10): LengthAwarePaginator
     {
         $query = Task::with(['creator:id,name,email','assignee:id,name,email'])
             ->where('assignee_id', $user->id);
@@ -17,16 +18,17 @@ class TaskService
             $query->where('priority', $priority);
         }
 
-        $tasks = $query->orderBy('due_date')->get();
-        $tasks->each(function ($task) {
-            $task->append('derived_status');
-        });
+        $paginator = $query->orderBy('due_date')->paginate($perPage);
+        $tasks = collect($paginator->items());
+        $tasks->each(fn($task) => $task->append('derived_status'));
 
         if ($status) {
-            $tasks = $tasks->filter(fn($task) => $task->derived_status === $status)->values();
+            $filtered = $tasks->filter(fn($task) => $task->derived_status === $status)->values();
+            // replace paginator items with filtered set but keep meta consistent
+            $paginator->setCollection($filtered);
         }
 
-        return $tasks;
+        return $paginator;
     }
 
     public function createTask(User $creator, array $data): Task

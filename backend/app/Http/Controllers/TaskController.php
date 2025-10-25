@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\TaskStoreRequest;
 use App\Http\Requests\TaskUpdateRequest;
@@ -19,9 +18,10 @@ class TaskController extends Controller
         $tasks = app(TaskService::class)->listAssignedTasks(
             $user,
             $request->query('priority'),
-            $request->query('status')
+            $request->query('status'),
+            (int) $request->query('per_page', 10)
         );
-        return TaskResource::collection($tasks);
+        return $this->paginated($tasks, TaskResource::class);
     }
 
     public function store(TaskStoreRequest $request)
