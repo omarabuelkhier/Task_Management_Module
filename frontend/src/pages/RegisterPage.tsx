@@ -25,26 +25,26 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <form onSubmit={onSubmit} className="bg-white p-6 rounded shadow max-w-sm w-full space-y-3">
-        <h1 className="text-xl font-semibold">Register</h1>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+      <form onSubmit={onSubmit} className="card w-full max-w-sm space-y-3">
+        <h1>Register</h1>
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
         <div>
-          <label className="block text-sm">Name</label>
-          <input value={name} onChange={e=>setName(e.target.value)} className="mt-1 w-full border rounded px-3 py-2" required />
+          <label className="label">Name</label>
+          <input value={name} onChange={e=>setName(e.target.value)} className="input mt-1" required />
         </div>
         <div>
-          <label className="block text-sm">Email</label>
-          <input value={email} onChange={e=>setEmail(e.target.value)} className="mt-1 w-full border rounded px-3 py-2" type="email" required />
+          <label className="label">Email</label>
+          <input value={email} onChange={e=>setEmail(e.target.value)} className="input mt-1" type="email" required />
         </div>
         <div>
-          <label className="block text-sm">Password</label>
-          <input value={password} onChange={e=>setPassword(e.target.value)} className="mt-1 w-full border rounded px-3 py-2" type="password" required />
+          <label className="label">Password</label>
+          <input value={password} onChange={e=>setPassword(e.target.value)} className="input mt-1" type="password" required />
         </div>
-        <button disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-60">
+        <button disabled={loading} className="btn-primary w-full">
           {loading ? 'Creating…' : 'Register'}
         </button>
-        <div className="text-sm text-center">
-          Have an account? <Link to="/login" className="text-blue-600">Login</Link>
+        <div className="text-center text-sm">
+          Have an account? <Link to="/login" className="text-blue-600 dark:text-blue-400">Login</Link>
         </div>
       </form>
     </div>

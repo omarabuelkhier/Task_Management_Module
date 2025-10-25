@@ -59,40 +59,40 @@ export default function TasksPage() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="max-w-5xl mx-auto p-4">
-        <div className="flex flex-wrap gap-2 items-center justify-between mb-4">
-          <div className="flex gap-2 items-center">
-            <select value={status} onChange={e=>setStatus(e.target.value as any)} className="border rounded px-2 py-1">
+      <div className="mx-auto w-full max-w-6xl p-4 sm:p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <select value={status} onChange={e=>setStatus(e.target.value as any)} className="select">
               {['All','Missed/Late','Due Today','Upcoming','Done'].map(s => <option key={s} value={s}>{s}</option>)}
             </select>
-            <select value={priority} onChange={e=>setPriority(e.target.value as any)} className="border rounded px-2 py-1">
+            <select value={priority} onChange={e=>setPriority(e.target.value as any)} className="select">
               {['All','low','medium','high'].map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
-          <Link to="/tasks/new" className="px-3 py-1.5 bg-blue-600 text-white rounded">New Task</Link>
+          <Link to="/tasks/new" className="btn-primary">New Task</Link>
         </div>
 
         {loading && <p>Loading…</p>}
-        {error && <p className="text-red-600">{error}</p>}
+        {error && <p className="text-red-600 dark:text-red-400">{error}</p>}
 
-        <ul className="space-y-2">
+        <ul className="grid grid-cols-1 gap-3 sm:gap-4">
           {filtered.map(task => (
-            <li key={task.id} className="bg-white p-3 rounded border flex items-center justify-between">
+            <li key={task.id} className="card flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
               <div>
-                <div className="font-medium flex items-center gap-2">
+                <div className="flex items-center gap-2 font-medium">
                   {task.title}
                   {task.derived_status && <StatusBadge status={task.derived_status} />}
                   <PriorityBadge priority={task.priority} />
                 </div>
-                {task.description && <p className="text-sm text-gray-600">{task.description}</p>}
+                {task.description && <p className="text-sm text-gray-600 dark:text-gray-300">{task.description}</p>}
                 <p className="text-xs text-gray-500">Due: {new Date(task.due_date).toLocaleString()}</p>
               </div>
               <div className="flex gap-2">
-                <button onClick={()=>toggle(task)} className="px-2 py-1 border rounded">
+                <button onClick={()=>toggle(task)} className="btn-secondary">
                   {task.is_completed ? 'Mark Incomplete' : 'Mark Done'}
                 </button>
-                <Link to={`/tasks/${task.id}/edit`} className="px-2 py-1 border rounded">Edit</Link>
-                <button onClick={()=>remove(task)} className="px-2 py-1 border rounded text-red-600">Delete</button>
+                <Link to={`/tasks/${task.id}/edit`} className="btn-secondary">Edit</Link>
+                <button onClick={()=>remove(task)} className="btn-danger">Delete</button>
               </div>
             </li>
           ))}

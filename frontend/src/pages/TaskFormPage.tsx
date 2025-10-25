@@ -66,37 +66,37 @@ export default function TaskFormPage() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="max-w-xl mx-auto p-4">
-        <form onSubmit={onSubmit} className="bg-white p-6 rounded shadow space-y-3">
-          <h1 className="text-xl font-semibold">{isEdit ? 'Edit Task' : 'New Task'}</h1>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+      <div className="mx-auto w-full max-w-2xl p-4 sm:p-6">
+        <form onSubmit={onSubmit} className="card space-y-3 sm:space-y-4">
+          <h1>{isEdit ? 'Edit Task' : 'New Task'}</h1>
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <div>
-            <label className="block text-sm">Title</label>
-            <input value={title} onChange={e=>setTitle(e.target.value)} className="mt-1 w-full border rounded px-3 py-2" required />
+            <label className="label">Title</label>
+            <input value={title} onChange={e=>setTitle(e.target.value)} className="input mt-1" required />
           </div>
           <div>
-            <label className="block text-sm">Description</label>
-            <textarea value={description} onChange={e=>setDescription(e.target.value)} className="mt-1 w-full border rounded px-3 py-2" rows={4} />
+            <label className="label">Description</label>
+            <textarea value={description} onChange={e=>setDescription(e.target.value)} className="textarea mt-1" />
           </div>
           <div>
-            <label className="block text-sm">Due Date</label>
-            <input value={dueDate} onChange={e=>setDueDate(e.target.value)} className="mt-1 w-full border rounded px-3 py-2" type="datetime-local" required />
+            <label className="label">Due Date</label>
+            <input value={dueDate} onChange={e=>setDueDate(e.target.value)} className="input mt-1" type="datetime-local" required />
           </div>
           {!isEdit && (
             <div>
-              <label className="block text-sm">Assignee Email</label>
-              <input value={assigneeEmail} onChange={e=>setAssigneeEmail(e.target.value)} className="mt-1 w-full border rounded px-3 py-2" type="email" required />
+              <label className="label">Assignee Email</label>
+              <input value={assigneeEmail} onChange={e=>setAssigneeEmail(e.target.value)} className="input mt-1" type="email" required />
             </div>
           )}
           <div>
-            <label className="block text-sm">Priority</label>
-            <select value={priority} onChange={e=>setPriority(e.target.value as any)} className="mt-1 w-full border rounded px-3 py-2">
+            <label className="label">Priority</label>
+            <select value={priority} onChange={e=>setPriority(e.target.value as any)} className="select mt-1">
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
             </select>
           </div>
-          <button disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-60">
+          <button disabled={loading} className="btn-primary">
             {loading ? 'Saving…' : 'Save'}
           </button>
         </form>
