@@ -14,7 +14,7 @@ export default function TaskFormPage() {
   const [description, setDescription] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState<'low'|'medium'|'high'>('medium')
-  const [assigneeEmail, setAssigneeEmail] = useState('bob@example.com')
+  const [assigneeEmail, setAssigneeEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
