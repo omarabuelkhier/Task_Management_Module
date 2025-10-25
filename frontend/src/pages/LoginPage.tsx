@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom'
 
 export default function LoginPage() {
   const { login } = useAuth()
-  const [email, setEmail] = useState('alice@example.com')
-  const [password, setPassword] = useState('password')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -29,11 +29,11 @@ export default function LoginPage() {
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
         <div>
           <label className="label">Email</label>
-          <input value={email} onChange={e=>setEmail(e.target.value)} className="input mt-1" type="email" required />
+          <input value={email} onChange={e=>setEmail(e.target.value)} className="input mt-1" type="email" placeholder="you@example.com" required />
         </div>
         <div>
           <label className="label">Password</label>
-          <input value={password} onChange={e=>setPassword(e.target.value)} className="input mt-1" type="password" required />
+          <input value={password} onChange={e=>setPassword(e.target.value)} className="input mt-1" type="password" placeholder="••••••••" required />
         </div>
         <button disabled={loading} className="btn-primary w-full">
           {loading ? 'Signing in…' : 'Login'}
