@@ -1,0 +1,100 @@
+services:
+    backend:
+        container_name: taskmod-backend
+        command: ["frankenphp", "run", "-w", "--config", "/etc/caddy/Caddyfile"]
+        build:
+            context: .
+            dockerfile: backend/Dockerfile
+        ports:
+            - "${BACKEND_PORT:-8080}:80"
+        environment:
+            APP_ENV: ${APP_ENV:-local}
+            APP_DEBUG: ${APP_DEBUG:-true}
+            APP_URL: ${APP_URL:-http://localhost:8080}
+            LOG_CHANNEL: stderr
+            DB_CONNECTION: mysql
+            DB_HOST: mysql
+            DB_PORT: 3306
+            DB_DATABASE: ${DB_DATABASE:-taskdb}
+            DB_USERNAME: ${DB_USERNAME:-app}
+            DB_PASSWORD: ${DB_PASSWORD:-secret}
+            CACHE_DRIVER: redis
+            REDIS_HOST: redis
+            SESSION_DRIVER: file
+            QUEUE_CONNECTION: database
+        volumes:
+            - ./backend:/app
+            - backend-storage:/app/storage
+        restart: unless-stopped
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost/robots.txt"]
+            interval: 10s
+            timeout: 3s
+            retries: 5
+        networks:
+            - appnet
+
+    frontend:
+        container_name: taskmod-frontend
+        build:
+            context: .
+            dockerfile: frontend/Dockerfile
+            args:
+                VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/api}
+        ports:
+            - "${FRONTEND_PORT:-5173}:80"
+        depends_on:
+            backend:
+                condition: service_healthy
+        networks:
+            - appnet
+
+    mysql:
+        container_name: mysql
+        image: mysql:8.0
+        restart: unless-stopped
+        ports:
+            - "${FORWARD_DB_PORT:-3307}:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-secret}"
+            MYSQL_DATABASE: "${DB_DATABASE:-taskdb}"
+            MYSQL_USER: "${DB_USERNAME:-app}"
+            MYSQL_PASSWORD: "${DB_PASSWORD:-secret}"
+        volumes:
+            - mysql-data:/var/lib/mysql
+        networks:
+            - appnet
+        healthcheck:
+            test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1"]
+            interval: 10s
+            timeout: 5s
+            start_period: 30s
+            retries: 10
+
+    redis:
+        container_name: redis
+        image: redis:alpine
+        restart: unless-stopped
+        ports:
+            - "${FORWARD_REDIS_PORT:-6379}:6379"
+        volumes:
+            - redis-data:/data
+        networks:
+            - appnet
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            retries: 5
+
+networks:
+    appnet:
+        driver: bridge
+
+volumes:
+    mysql-data:
+    redis-data:
+    backend-storage:
