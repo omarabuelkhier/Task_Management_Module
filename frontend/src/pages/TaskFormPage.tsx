@@ -66,7 +66,12 @@ export default function TaskFormPage() {
         initialValuesRef.current = { title: task.title, description: task.description || '', date, time, priority: task.priority as any } as FormValues
       } catch (err: any) {
         // Only show load error in edit mode; create mode should not display anything
-        setServerError(err?.response?.data?.message || 'Failed to load task')
+        const status = err?.response?.status
+        if (status === 403) {
+          setServerError('You are not allowed to view or edit this task (assignee-only).')
+        } else {
+          setServerError(err?.response?.data?.message || 'Failed to load task')
+        }
       }
     }
     load()
@@ -100,7 +105,10 @@ export default function TaskFormPage() {
         <form onSubmit={onSubmit} className="card space-y-3 sm:space-y-4 overflow-visible" noValidate>
           <h1>{isEdit ? 'Edit Task' : 'New Task'}</h1>
           {serverError && (
-            <div className="alert alert-error mt-2">{serverError}</div>
+            <div className="alert alert-error mt-2 flex items-center justify-between gap-2">
+              <span>{serverError}</span>
+              <Link to="/tasks" className="btn-secondary">Back</Link>
+            </div>
           )}
           <div>
             <label className="label-accent">Title</label>
