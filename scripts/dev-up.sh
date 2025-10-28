@@ -4,7 +4,12 @@ set -euo pipefail
 red() { printf "\033[31m%s\033[0m\n" "$*"; }
 
 echo "[1/5] Building and starting containers..."
-docker compose build --no-cache || { red "docker compose build failed"; exit 1; }
+if [ "${DEV_NO_CACHE:-0}" = "1" ] || [ "${DEV_NO_CACHE:-false}" = "true" ]; then
+  echo "Building images with --no-cache (DEV_NO_CACHE=$DEV_NO_CACHE)"
+  docker compose build --no-cache || { red "docker compose build failed"; exit 1; }
+else
+  docker compose build || { red "docker compose build failed"; exit 1; }
+fi
 docker compose up -d || { red "docker compose up failed"; exit 1; }
 
 echo "[2/5] Waiting for backend container (taskmod-backend) to be healthy..."

@@ -8,7 +8,20 @@ function fail
 end
 
 echo "[1/5] Building and starting containers..."
-docker compose build --no-cache; or fail "docker compose build failed"
+set use_nocache 0
+if set -q DEV_NO_CACHE
+  if test "$DEV_NO_CACHE" = "1" -o "$DEV_NO_CACHE" = "true"
+    set use_nocache 1
+  end
+end
+
+if test $use_nocache -eq 1
+  echo "Building images with --no-cache (DEV_NO_CACHE=$DEV_NO_CACHE)"
+  docker compose build --no-cache; or fail "docker compose build failed"
+else
+  docker compose build; or fail "docker compose build failed"
+end
+
 docker compose up -d ; or fail "docker compose up failed"
 
 echo "[2/5] Waiting for backend container (taskmod-backend) to be healthy..."
