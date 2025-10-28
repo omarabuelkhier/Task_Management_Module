@@ -21,6 +21,18 @@ export function setAuthToken(token: string | null) {
 axiosClient.interceptors.response.use(
   (res) => res,
   (err) => {
+    if (err?.response?.status === 429) {
+      // Too Many Requests: show a polite message
+      if (typeof window !== 'undefined') {
+        // avoid spamming multiple alerts by debouncing through a flag
+        const flag = '__tm_429_shown__'
+        if (!(window as any)[flag]) {
+          (window as any)[flag] = true
+          alert('Too many requests. Please wait a moment and try again.')
+          setTimeout(() => { (window as any)[flag] = false }, 3000)
+        }
+      }
+    }
     if (err?.response?.status === 401) {
       try {
         localStorage.removeItem('tm_token')

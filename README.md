@@ -45,3 +45,18 @@ Services:
 - If you reseed the DB, stale tokens will be invalid; the app clears auth on 401 and redirects to login.
 - Ensure `APP_KEY` exists (the scripts generate it if missing).
 - Check `docker compose logs backend` if healthcheck fails.
+
+## Assessment compliance (summary)
+
+This implementation aligns with the brief:
+
+- Security: Laravel Sanctum auth, password hashing, validation via FormRequests, strict policies (assignee-only view/edit/toggle; creator can assign/delete), CORS configured.
+- API design: RESTful endpoints for auth and tasks, standardized envelopes, pagination meta, correlation-ready logging (can add webhooks later).
+- Performance: DB indexes on tasks.assignee_id and tasks.due_date, route throttling for auth/mutations.
+- Usability: Responsive, mobile-friendly UI; derived statuses (Done, Missed/Late, Due Today, Upcoming); searchable assignee; loading spinners; optimistic toggles.
+- Error handling: Clear messages, global 401 handling, friendly 403 edit message.
+- Modularity: Service layer (TaskService), API Resources, and React services make it easy to plug into broader systems.
+
+## Submission
+
+Submit by emailing the repository link to <mailto:development.team@innovation-gate.ae> within 7 days of receipt.
