@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserController;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -19,4 +20,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tasks/{task}/assign', [TaskController::class, 'assign']);
 
     Route::get('/users/lookup', [AuthController::class, 'lookupUserByEmail']);
+    Route::get('/users', [UserController::class, 'index']);
 });

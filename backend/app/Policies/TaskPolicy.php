@@ -19,7 +19,7 @@ class TaskPolicy
 
     public function delete(User $user, Task $task): bool
     {
-        return $task->assignee_id === $user->id || $task->creator_id === $user->id;
+        return $task->assignee_id === $user->id;
     }
 
     public function assign(User $user, Task $task): bool
