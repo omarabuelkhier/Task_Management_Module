@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { showToast } from '../context/ToastContext'
 
 export const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api',
@@ -22,14 +23,13 @@ axiosClient.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err?.response?.status === 429) {
-      // Too Many Requests: show a polite message
+      // Too Many Requests: show a polite, non-blocking toast
       if (typeof window !== 'undefined') {
-        // avoid spamming multiple alerts by debouncing through a flag
         const flag = '__tm_429_shown__'
         if (!(window as any)[flag]) {
           (window as any)[flag] = true
-          alert('Too many requests. Please wait a moment and try again.')
-          setTimeout(() => { (window as any)[flag] = false }, 3000)
+          showToast('Too many requests. Please wait a moment and try again.', { type: 'info' })
+          setTimeout(() => { (window as any)[flag] = false }, 2000)
         }
       }
     }

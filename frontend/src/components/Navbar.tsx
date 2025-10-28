@@ -1,9 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useState } from 'react'
+import ButtonSpinner from './ButtonSpinner'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
   const location = useLocation()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   return (
     <nav className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 backdrop-blur dark:border-gray-800 dark:bg-gray-900/80">
   <div className="flex h-14 w-full items-center justify-between px-4 md:px-6">
@@ -18,7 +21,19 @@ export default function Navbar() {
             </Link>
           )}
           <span className="hidden text-sm text-gray-600 dark:text-gray-300 sm:inline">{user?.email}</span>
-          <button onClick={logout} className="btn-secondary">Logout</button>
+          <button
+            onClick={async () => {
+              if (isLoggingOut) return
+              setIsLoggingOut(true)
+              try { await logout() } finally { setIsLoggingOut(false) }
+            }}
+            className="btn-secondary inline-flex items-center gap-2 disabled:opacity-60"
+            disabled={isLoggingOut}
+            aria-busy={isLoggingOut}
+          >
+            {isLoggingOut && <ButtonSpinner />}
+            Logout
+          </button>
         </div>
       </div>
     </nav>

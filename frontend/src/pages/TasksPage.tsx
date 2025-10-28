@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar'
 import Spinner from '../components/Spinner'
 import ButtonSpinner from '../components/ButtonSpinner'
 import { axiosClient } from '../lib/axiosClient'
+import { showToast } from '../context/ToastContext'
 import { Task, DerivedStatus, Priority } from '../types/task'
 import StatusBadge from '../components/StatusBadge'
 import PriorityBadge from '../components/PriorityBadge'
@@ -59,7 +60,7 @@ export default function TasksPage() {
       setTasks(prev) // rollback
       const status = err?.response?.status
       if (status === 401) return
-      alert(err?.response?.data?.message || 'Failed to toggle task')
+      showToast(err?.response?.data?.message || 'Failed to toggle task', { type: 'error' })
     } finally {
       setTogglingIds(prev => {
         const next = new Set(prev)
@@ -77,7 +78,7 @@ export default function TasksPage() {
       await axiosClient.delete(`/tasks/${task.id}`)
       setTasks(prev => prev.filter(t => t.id !== task.id))
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete task')
+      showToast(err?.response?.data?.message || 'Failed to delete task', { type: 'error' })
     } finally {
       setDeletingIds(prev => {
         const next = new Set(prev)

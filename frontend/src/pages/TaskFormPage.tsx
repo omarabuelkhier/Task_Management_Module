@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Navbar from '../components/Navbar'
 import { axiosClient } from '../lib/axiosClient'
+import { showToast } from '../context/ToastContext'
 import { fetchTask, updateTask, createTask } from '../services/tasks'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Task } from '../types/task'
@@ -72,9 +73,13 @@ export default function TaskFormPage() {
         // Only show load error in edit mode; create mode should not display anything
         const status = err?.response?.status
         if (status === 403) {
-          setServerError('You are not allowed to view or edit this task (assignee-only).')
+          const msg = 'You are not allowed to view or edit this task (assignee-only).'
+          setServerError(msg)
+          showToast(msg, { type: 'error' })
         } else {
-          setServerError(err?.response?.data?.message || 'Failed to load task')
+          const msg = err?.response?.data?.message || 'Failed to load task'
+          setServerError(msg)
+          showToast(msg, { type: 'error' })
         }
       } finally {
         setLoading(false)
@@ -100,7 +105,9 @@ export default function TaskFormPage() {
       }
       navigate('/tasks')
     } catch (err: any) {
-      setServerError(err?.response?.data?.message || 'Failed to save task')
+      const msg = err?.response?.data?.message || 'Failed to save task'
+      setServerError(msg)
+      showToast(msg, { type: 'error' })
     }
   })
 
