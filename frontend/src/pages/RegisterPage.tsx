@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import ButtonSpinner from '../components/ButtonSpinner'
 
 const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -49,8 +50,13 @@ export default function RegisterPage() {
           <input {...formRegister('password')} className="input mt-1" type="password" placeholder="••••••••" />
           {errors.password && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.password.message}</p>}
         </div>
-        <button disabled={isSubmitting} className="btn-gradient w-full">
-          {isSubmitting ? 'Creating…' : 'Register'}
+        <button
+          disabled={isSubmitting}
+          aria-busy={isSubmitting}
+          className="btn-gradient w-full inline-flex items-center justify-center gap-2"
+        >
+          {isSubmitting && <ButtonSpinner />}
+          <span>{isSubmitting ? 'Creating…' : 'Register'}</span>
         </button>
         <div className="text-center text-sm">
           Have an account? <Link to="/login" className="text-blue-600 dark:text-blue-400">Login</Link>

@@ -9,6 +9,8 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserLite } from '../services/users'
 import UserSelect from '../components/UserSelect'
+import Spinner from '../components/Spinner'
+import ButtonSpinner from '../components/ButtonSpinner'
 
 const baseSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -31,6 +33,7 @@ export default function TaskFormPage() {
   const isEdit = Boolean(id)
   const [selectedUser, setSelectedUser] = useState<UserLite | null>(null)
   const [serverError, setServerError] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
   const initialValuesRef = useRef<FormValues | null>(null)
   const resolver = useMemo(() => zodResolver(isEdit ? editSchema : createSchema), [isEdit])
   const { register, handleSubmit, reset, formState: { errors, isSubmitting, isSubmitted } } = useForm<FormValues>({
@@ -56,6 +59,7 @@ export default function TaskFormPage() {
   useEffect(() => {
     const load = async () => {
       if (!isEdit) return
+      setLoading(true)
       try {
         const task = await fetchTask(Number(id))
         const d = new Date(task.due_date)
@@ -72,6 +76,8 @@ export default function TaskFormPage() {
         } else {
           setServerError(err?.response?.data?.message || 'Failed to load task')
         }
+      } finally {
+        setLoading(false)
       }
     }
     load()
@@ -104,6 +110,7 @@ export default function TaskFormPage() {
   <div className="w-full px-4 md:px-6 py-4 sm:py-6 pb-safe overflow-visible">
         <form onSubmit={onSubmit} className="card space-y-3 sm:space-y-4 overflow-visible" noValidate>
           <h1>{isEdit ? 'Edit Task' : 'New Task'}</h1>
+          {loading && isEdit && <Spinner label="Loading task…" />}
           {serverError && (
             <div className="alert alert-error mt-2 flex items-center justify-between gap-2">
               <span>{serverError}</span>
@@ -112,23 +119,23 @@ export default function TaskFormPage() {
           )}
           <div>
             <label className="label-accent">Title</label>
-            <input {...register('title')} className="input mt-1 min-h-[2.75rem]" onFocus={handleFocusCenter} />
+            <input disabled={loading} {...register('title')} className="input mt-1 min-h-[2.75rem] disabled:opacity-60" onFocus={handleFocusCenter} />
             {errors.title && <div className="mt-1 alert-error">{errors.title.message}</div>}
           </div>
           <div>
             <label className="label-accent">Description</label>
-            <textarea {...register('description')} className="textarea mt-1 min-h-[2.75rem]" onFocus={handleFocusCenter} />
+            <textarea disabled={loading} {...register('description')} className="textarea mt-1 min-h-[2.75rem] disabled:opacity-60" onFocus={handleFocusCenter} />
             {errors.description && <div className="mt-1 alert-error">{errors.description.message}</div>}
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="label-accent">Due Date</label>
-              <input {...register('date')} className="input mt-1 min-h-[2.75rem]" type="date" onFocus={handleFocusCenter} />
+              <input disabled={loading} {...register('date')} className="input mt-1 min-h-[2.75rem] disabled:opacity-60" type="date" onFocus={handleFocusCenter} />
               {errors.date && <div className="mt-1 alert-error">{errors.date.message}</div>}
             </div>
             <div>
               <label className="label-accent">Due Time</label>
-              <input {...register('time')} className="input mt-1 min-h-[2.75rem]" type="time" onFocus={handleFocusCenter} />
+              <input disabled={loading} {...register('time')} className="input mt-1 min-h-[2.75rem] disabled:opacity-60" type="time" onFocus={handleFocusCenter} />
               {errors.time && <div className="mt-1 alert-error">{errors.time.message}</div>}
             </div>
           </div>
@@ -148,15 +155,20 @@ export default function TaskFormPage() {
           )}
           <div>
             <label className="label-accent">Priority</label>
-            <select {...register('priority')} className="select mt-1 min-h-[2.75rem]" onFocus={handleFocusCenter}>
+            <select disabled={loading} {...register('priority')} className="select mt-1 min-h-[2.75rem] disabled:opacity-60" onFocus={handleFocusCenter}>
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
             </select>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <button disabled={isSubmitting} className="btn-gradient w-full sm:w-auto">
-              {isSubmitting ? 'Saving…' : 'Save'}
+            <button
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+              className="btn-gradient inline-flex items-center justify-center gap-2 w-full sm:w-auto"
+            >
+              {isSubmitting && <ButtonSpinner />}
+              <span>{isSubmitting ? 'Saving…' : 'Save'}</span>
             </button>
             {isEdit && (
               <button
