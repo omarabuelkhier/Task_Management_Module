@@ -1,0 +1,28 @@
+{
+  frankenphp
+  order php_server before file_server
+}
+
+:80 {
+  root * /app/public
+  encode zstd br gzip
+
+  @static {
+    file
+    path_regexp static \.(css|js|png|jpg|jpeg|svg|gif|webp|ico|txt|woff2?)$
+  }
+  handle @static {
+    header Cache-Control "public, max-age=86400"
+    file_server
+  }
+
+  try_files {path} /index.php?{query}
+
+  handle {
+    php_server {
+      try_duration 30s
+    }
+  }
+
+  file_server
+}
