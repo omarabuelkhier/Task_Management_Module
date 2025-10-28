@@ -8,7 +8,8 @@ function fail
 end
 
 echo "[1/5] Building and starting containers..."
-docker compose up -d --build; or fail "docker compose up failed"
+docker compose build --no-cache; or fail "docker compose build failed"
+docker compose up -d ; or fail "docker compose up failed"
 
 echo "[2/5] Waiting for backend container (taskmod-backend) to be healthy..."
 set max_tries 60

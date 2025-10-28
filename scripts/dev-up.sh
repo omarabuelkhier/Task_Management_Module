@@ -4,7 +4,8 @@ set -euo pipefail
 red() { printf "\033[31m%s\033[0m\n" "$*"; }
 
 echo "[1/5] Building and starting containers..."
-docker compose up -d --build || { red "docker compose up failed"; exit 1; }
+docker compose build --no-cache || { red "docker compose build failed"; exit 1; }
+docker compose up -d || { red "docker compose up failed"; exit 1; }
 
 echo "[2/5] Waiting for backend container (taskmod-backend) to be healthy..."
 MAX_TRIES=60
