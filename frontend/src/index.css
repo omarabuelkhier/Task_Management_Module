@@ -20,11 +20,42 @@
   .btn-primary { @apply btn bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600; }
   .btn-secondary { @apply btn border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 focus:ring-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800; }
   .btn-danger { @apply btn border border-red-300 text-red-700 hover:bg-red-50 focus:ring-red-400 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30; }
+  .btn-gradient { @apply btn text-white bg-gradient-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-500 hover:to-fuchsia-500 focus:ring-indigo-500; }
+  .btn-success { @apply btn bg-green-600 text-white hover:bg-green-700 focus:ring-green-500; }
+  .btn-warning { @apply btn bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-400; }
+  .btn-info { @apply btn bg-sky-500 text-white hover:bg-sky-600 focus:ring-sky-400; }
 
   .input { @apply block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100; }
   .label { @apply block text-sm text-gray-700 dark:text-gray-300; }
+  .label-accent { @apply label text-blue-700 dark:text-blue-300; }
   .select { @apply input pr-8; }
   .textarea { @apply input min-h-[120px]; }
 
-  .card { @apply rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900; }
+  .card { @apply rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-gray-800 dark:bg-gray-900; }
+  .badge { @apply inline-flex items-center rounded border px-2 py-0.5 text-xs; }
+  .badge-blue { @apply badge border-blue-200 bg-blue-100 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300; }
+  .badge-purple { @apply badge border-purple-200 bg-purple-100 text-purple-700 dark:border-purple-800 dark:bg-purple-900/30 dark:text-purple-300; }
+  .badge-amber { @apply badge border-amber-200 bg-amber-100 text-amber-800 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300; }
+}
+
+/* Ensure native date/time pickers remain visible in dark mode */
+input[type="date"], input[type="time"], input[type="datetime-local"] {
+  color-scheme: light;
+}
+/* Improve accent color for check/radio/select in dark */
+input, select, textarea {
+  accent-color: #3b82f6; /* tailwind blue-500 */
+}
+
+/* Alerts */
+@layer components {
+  .alert { @apply rounded-md border p-2 text-sm; }
+  .alert-error { @apply alert border-red-300 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300; }
+  .alert-success { @apply alert border-green-300 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-300; }
+  .alert-info { @apply alert border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300; }
+}
+
+/* Safe-area paddings for modern phones */
+@layer utilities {
+  .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
 }

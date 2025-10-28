@@ -11,6 +11,7 @@ type User = {
 type AuthContextType = {
   user: User | null
   token: string | null
+  ready: boolean
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => Promise<void>
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     const savedToken = localStorage.getItem('tm_token')
@@ -33,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (savedUser) {
       setUser(JSON.parse(savedUser))
     }
+    setReady(true)
   }, [])
 
   useEffect(() => {
@@ -71,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     navigate('/login')
   }
 
-  const value = useMemo(() => ({ user, token, login, register, logout }), [user, token])
+  const value = useMemo(() => ({ user, token, ready, login, register, logout }), [user, token, ready])
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 

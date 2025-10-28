@@ -5,7 +5,7 @@ import { Task, DerivedStatus, Priority } from '../types/task'
 import StatusBadge from '../components/StatusBadge'
 import PriorityBadge from '../components/PriorityBadge'
 import { Link } from 'react-router-dom'
-import { fetchTasks } from '../services/tasks'
+import { fetchTasks, toggleTask } from '../services/tasks'
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -42,10 +42,17 @@ export default function TasksPage() {
   }, [tasks, status])
 
   const toggle = async (task: Task) => {
+    // optimistic update
+    const prev = tasks
+    const optimistic = prev.map(t => t.id === task.id ? { ...t, is_completed: !t.is_completed } : t)
+    setTasks(optimistic)
     try {
-      const { data } = await axiosClient.post<Task>(`/tasks/${task.id}/toggle`)
-      setTasks(prev => prev.map(t => t.id === task.id ? data : t))
+      const updated = await toggleTask(task.id)
+      setTasks(p => p.map(t => t.id === task.id ? updated : t))
     } catch (err: any) {
+      setTasks(prev) // rollback
+      const status = err?.response?.status
+      if (status === 401) return
       alert(err?.response?.data?.message || 'Failed to toggle task')
     }
   }
@@ -61,9 +68,9 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="min-h-screen">
+  <div className="min-h-screen overflow-x-hidden">
       <Navbar />
-  <div className="mx-auto w-full max-w-6xl p-4 sm:p-6">
+  <div className="w-full px-4 md:px-6 py-4 sm:py-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div className="flex w-full items-center gap-2 sm:w-auto">
             <select value={status} onChange={e=>setStatus(e.target.value as any)} className="select">
@@ -73,7 +80,7 @@ export default function TasksPage() {
               {['All','low','medium','high'].map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
-          <Link to="/tasks/new" className="btn-primary">New Task</Link>
+          <Link to="/tasks/new" className="btn-gradient">New Task</Link>
         </div>
 
         {loading && <p>Loading…</p>}
@@ -92,10 +99,10 @@ export default function TasksPage() {
                 <p className="text-xs text-gray-500">Due: {new Date(task.due_date).toLocaleString()}</p>
               </div>
               <div className="flex gap-2">
-                <button onClick={()=>toggle(task)} className="btn-secondary">
+                <button onClick={()=>toggle(task)} className="btn-success">
                   {task.is_completed ? 'Mark Incomplete' : 'Mark Done'}
                 </button>
-                <Link to={`/tasks/${task.id}/edit`} className="btn-secondary">Edit</Link>
+                <Link to={`/tasks/${task.id}/edit`} className="btn-warning">Edit</Link>
                 <button onClick={()=>remove(task)} className="btn-danger">Delete</button>
               </div>
             </li>

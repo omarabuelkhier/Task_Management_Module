@@ -16,3 +16,21 @@ export function setAuthToken(token: string | null) {
     delete axiosClient.defaults.headers.common['Authorization']
   }
 }
+
+// Centralize 401 handling: clear auth and bounce to login
+axiosClient.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err?.response?.status === 401) {
+      try {
+        localStorage.removeItem('tm_token')
+        localStorage.removeItem('tm_user')
+      } catch {}
+      // soft redirect; avoids tight coupling to router here
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
+    }
+    return Promise.reject(err)
+  }
+)
